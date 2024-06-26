@@ -1,8 +1,8 @@
 <%- include('../partials/header', {title: title}) -%>
     <h1><%- title %></h1>
     <ul>
-        <%for (let user of users){%> 
-            <li><a href="/auth/admin/users/<%=user.id%>"><%= user.email %></a></li>
+        <%for (let userElement of users){%> 
+            <li><a href="<%=  (userElement.id === user.id) ? "/auth/profile" : `/auth/admin/users/${userElement.id}` %>"><%= user.email %></a></li>
         <%}%>
     </ul>
    

@@ -21,7 +21,7 @@ app.use(
     secret: "kadea academy",
     resave: false,
     saveUninitialized: false,
-    store: new SQLiteStore({ db: "sessions.db", dir: "./var/db" }),
+    store: new SQLiteStore({ db: "sessions.db", dir: "./db" }),
   })
 );
 
@@ -172,8 +172,7 @@ app.post("/admin/users/:targetUserId/delete", ensureAdmin, (req, res) => {
       message: "user not found",
       error: { status: 404 },
     });
-  }
-
+  } 
   users.splice(targetUserIndex, 1);
   return res.redirect("/auth/admin/users");
 });
@@ -194,6 +193,25 @@ app.post("/admin/users/:targetUserId/edit", ensureAdmin, (req, res) => {
     error: { status: 404 },
   });
 });
+
+
+app.post("/auth/profil/:targetUserId/edit", ensureAdmin, (req, res) => {
+  const { email, role } = req.body;
+  const { targetUserId } = req.params;
+  const targetUser = users.find((user) => user.id === targetUserId);
+
+  if (targetUser) {
+    targetUser.email = email;
+    targetUser.role = role;
+
+    return res.redirect(`/auth/admin/users/${targetUser.id}`);
+  }
+  return res.render("error", {
+    message: "user not found",
+    error: { status: 404 },
+  });
+});
+
 
 app.use(function (err, req, res, next) {
   res.locals.message = err.message;
