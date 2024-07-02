@@ -122,6 +122,16 @@ app.get("/auth/signup", (req, res) => {
   res.render("auth/signup", { title: "Register Page", user: req.user });
 });
 
+// sitting route get tou take data from the server for userAcompte 
+app.get("/auth/userAcompte", ensureAuthenticated, async (req, res) => {
+
+  res.render("auth/userAcompte", {user: req.user })
+  
+  })
+
+
+//........
+
 app.post("/auth/signup", async (req, res) => {
   const hashedPassword = await bcrypt.hash(req.body.password, saltRounds);
   const user = {
@@ -155,6 +165,12 @@ app.get("/auth/admin/users", ensureAdmin, (req, res) => {
 app.get("/auth/admin/users/:targetUserId", ensureAdmin, (req, res) => {
   const { targetUserId } = req.params;
   const targetUser = users.find((user) => user.id === targetUserId);
+
+  // if the user clic on is own acompte, return on his profil
+  if(targetUser.id === req.user.id){
+    return res.redirect("/auth/profile")
+  }
+//................
   if (targetUser) {
     return res.render("admin/user", { user: req.user, targetUser });
   }
@@ -194,24 +210,28 @@ app.post("/admin/users/:targetUserId/edit", ensureAdmin, (req, res) => {
   });
 });
 
-
-app.post("/auth/profil/:targetUserId/edit", ensureAdmin, (req, res) => {
-  const { email, role } = req.body;
-  const { targetUserId } = req.params;
-  const targetUser = users.find((user) => user.id === targetUserId);
+// sitting route for post to send data to the server userAcompte
+app.post("/userAcompte/edit", ensureAuthenticated, async (req, res) => {
+  const { email, password } = req.body;
+  const targetUser = users.find((user) => user.id === req.user.id);
 
   if (targetUser) {
-    targetUser.email = email;
-    targetUser.role = role;
+    targetUser.email = email || targetUser.email;
+    if (password) {
+      const hashedPassword = await bcrypt.hash(password, saltRounds);
+      targetUser.password = hashedPassword;
+    }
 
-    return res.redirect(`/auth/admin/users/${targetUser.id}`);
+    return res.redirect("/auth/profile");
   }
+  
   return res.render("error", {
-    message: "user not found",
+    message: "User not found",
     error: { status: 404 },
   });
+  
 });
-
+//...................
 
 app.use(function (err, req, res, next) {
   res.locals.message = err.message;

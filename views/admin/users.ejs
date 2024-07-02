@@ -2,7 +2,7 @@
     <h1><%- title %></h1>
     <ul>
         <%for (let userElement of users){%> 
-            <li><a href="<%=  (userElement.id === user.id) ? "/auth/profile" : `/auth/admin/users/${userElement.id}` %>"><%= user.email %></a></li>
+            <li><a href="<%=  (userElement.id === user.id) ? "/auth/profile" : `/auth/admin/users/${userElement.id}` %>"><%= userElement.email %></a></li>
         <%}%>
     </ul>
    
